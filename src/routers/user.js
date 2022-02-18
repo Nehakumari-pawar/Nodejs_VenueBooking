@@ -33,6 +33,60 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
+//router for getting all the data
+
+router.get('/users',async (req,res) =>{
+    try{
+        const allUsersRecord=await usersdata.find({})
+        res.send(allUsersRecord)
+    }
+    catch(e){
+        res.status(400).send(e)
+
+    }
+
+})
+
+//router for updating the data
+router.patch('/users/:id',auth, async(req,res) =>{
+    _id=req.body.id;
+    const updates=Object.keys(req.body);
+    const allowedUpdate=['name','email','password'];
+    const isValidOperation= updates.every((update)=> allowedUpdate.includes(update))
+
+    if(!isValidOperation)
+    {
+        return res.status(400).send({error: 'Invalid update!!!!' })
+    }
+    try{
+
+        const updateUser= await usersdata.findByIdAndUpadate(_id,req.body,{
+            new:true
+        })
+ if(!user)
+ {
+     return res.status(404).send()
+ }
+        res.send(updateUser)
+    }
+    catch(e){
+        res.status(501).send(e)
+
+    }
+})
+
+//for deleting data
+
+router.delete('/users/:id',auth, async(req,res)=>{
+    _id=req.params.id;
+    try{
+        const deleteUser= await usersdata.findByIdAndDelete(_id)
+        res.send(deleteUser);
+    }
+    catch(e){
+        res.status(401).send(e)
+    }
+})
 
 // for logout purpose
 router.get('/users/logout', auth, async(req,res) =>{
